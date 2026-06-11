@@ -1,0 +1,20 @@
+---
+- name: Deploy app to Windows VM
+  hosts: windows
+
+  tasks:
+
+    - name: Create website folder
+      win_file:
+        path: C:\inetpub\wwwroot
+        state: directory
+
+    - name: Copy application
+      win_copy:
+        src: ../app/index.html
+        dest: C:\inetpub\wwwroot\index.html
+
+    - name: Restart IIS
+      win_service:
+        name: W3SVC
+        state: restarted
