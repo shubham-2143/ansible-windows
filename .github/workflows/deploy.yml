@@ -16,14 +16,12 @@ jobs:
 
     - name: Install Ansible & WinRM Dependencies
       run: |
-        sudo apt update
-        sudo apt install -y python3-pip pipx
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pywinrm requests requests-ntlm
     
-        pipx install ansible
+        python3 -c "import winrm; print('WinRM OK')"
     
-        ~/.local/share/pipx/venvs/ansible/bin/pip install pywinrm requests requests-ntlm
-    
-        ~/.local/bin/ansible --version
+        ansible --version
     - name: Verify WinRM Package
       run: |
         python3 -c "import winrm; print('WinRM Installed Successfully')"
@@ -44,5 +42,8 @@ jobs:
         EOF
 
     - name: Run Playbook
+      env:
+       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
       run: |
-          ~/.local/bin/ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
+        python3 -m pip show pywinrm
+        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
