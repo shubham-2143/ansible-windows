@@ -14,14 +14,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install Ansible & WinRM Dependencies
+    - name: Install WinRM dependencies
       run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install pywinrm requests requests-ntlm
+        /opt/pipx/venvs/ansible-core/bin/python -m ensurepip --upgrade
     
-        python3 -c "import winrm; print('WinRM OK')"
+        /opt/pipx/venvs/ansible-core/bin/python -m pip install \
+          pywinrm \
+          requests \
+          requests-ntlm
     
-        ansible --version
+        /opt/pipx/venvs/ansible-core/bin/python -c \
+        "import winrm; print('WINRM OK')"
     - name: Verify WinRM Package
       run: |
         python3 -c "import winrm; print('WinRM Installed Successfully')"
@@ -42,8 +45,5 @@ jobs:
         EOF
 
     - name: Run Playbook
-      env:
-       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
       run: |
-        python3 -m pip show pywinrm
-        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
+       ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
