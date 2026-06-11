@@ -14,11 +14,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install Ansible & Dependencies
+    - name: Install Ansible & WinRM Dependencies
       run: |
         sudo apt update
         sudo apt install -y ansible python3-pip
-        pip3 install pywinrm requests requests-ntlm
+    
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pywinrm requests requests-ntlm
+    
+        ansible --version
+        python3 -c "import winrm; print(winrm.__file__)"
 
     - name: Verify WinRM Package
       run: |
@@ -41,4 +46,5 @@ jobs:
 
     - name: Run Playbook
       run: |
-        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+        export ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
+        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
