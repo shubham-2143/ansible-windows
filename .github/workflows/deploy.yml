@@ -17,13 +17,13 @@ jobs:
     - name: Install Ansible & WinRM Dependencies
       run: |
         sudo apt update
-        sudo apt install -y ansible python3-pip
+        sudo apt install -y python3-pip pipx
     
-        python3 -m pip install --upgrade pip
-        python3 -m pip install pywinrm requests requests-ntlm
+        pipx install ansible
     
-        ansible --version
-        python3 -c "import winrm; print(winrm.__file__)"
+        /opt/pipx/venvs/ansible-core/bin/pip install pywinrm requests requests-ntlm
+    
+        /opt/pipx_bin/ansible --version
 
     - name: Verify WinRM Package
       run: |
@@ -46,5 +46,4 @@ jobs:
 
     - name: Run Playbook
       run: |
-        export ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
-        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
+         /opt/pipx_bin/ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
