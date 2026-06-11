@@ -1,1 +1,42 @@
 
+name: Deploy to Windows VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Ansible
+      run: |
+        sudo apt update
+        sudo apt install -y ansible
+        pip install pywinrm
+
+    - name: Create Inventory
+      run: |
+        cat > ansible/inventory.ini << EOF
+        [windows]
+        vm ansible_host=${{ secrets.WIN_HOST }}
+
+        [windows:vars]
+        ansible_user=${{ secrets.WIN_USER }}
+        ansible_password=${{ secrets.WIN_PASSWORD }}
+        ansible_connection=winrm
+        ansible_port=5985
+        ansible_winrm_transport=basic
+        ansible_winrm_server_cert_validation=ignore
+        EOF
+
+    - name: Run Playbook
+      run: |
+        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
