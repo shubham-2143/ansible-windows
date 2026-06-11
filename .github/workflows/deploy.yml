@@ -21,10 +21,9 @@ jobs:
     
         pipx install ansible
     
-        /opt/pipx/venvs/ansible-core/bin/pip install pywinrm requests requests-ntlm
+        ~/.local/share/pipx/venvs/ansible/bin/pip install pywinrm requests requests-ntlm
     
-        /opt/pipx_bin/ansible --version
-
+        ~/.local/bin/ansible --version
     - name: Verify WinRM Package
       run: |
         python3 -c "import winrm; print('WinRM Installed Successfully')"
@@ -46,4 +45,4 @@ jobs:
 
     - name: Run Playbook
       run: |
-         /opt/pipx_bin/ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
+          ~/.local/bin/ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
