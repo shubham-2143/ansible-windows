@@ -43,6 +43,6 @@ jobs:
 
     - name: Run Playbook
       env:
-      PYTHONPATH: /home/runner/.local/lib/python3.12/site-packages
+       PYTHONPATH: /home/runner/.local/lib/python3.12/site-packages
       run: |
         ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
