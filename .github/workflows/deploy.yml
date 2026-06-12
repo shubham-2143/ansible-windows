@@ -10,39 +10,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Install Ansible & WinRM dependencies
+        run: |
+          python3 -m pip install --upgrade pip
 
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --user --upgrade pip
-        python3 -m pip install --user pywinrm requests requests-ntlm
-    
-        python3 -m pip list | grep winrm
-        python3 -c "import winrm; print(winrm.__file__)"
-        "import winrm; print('WINRM OK')"
-    - name: Verify WinRM Package
-      run: |
-        python3 -c "import winrm; print('WinRM Installed Successfully')"
+          python3 -m pip install \
+            ansible \
+            pywinrm \
+            requests \
+            requests-ntlm
 
-    - name: Create Inventory
-      run: |
-        cat > ansible/inventory.ini << EOF
-        [windows]
-        vm ansible_host=${{ secrets.WIN_HOST }}
+          python3 -c "import winrm; print('WinRM Installed Successfully')"
 
-        [windows:vars]
-        ansible_user=${{ secrets.WIN_USER }}
-        ansible_password=${{ secrets.WIN_PASSWORD }}
-        ansible_connection=winrm
-        ansible_port=5985
-        ansible_winrm_transport=basic
-        ansible_winrm_server_cert_validation=ignore
-        EOF
+      - name: Verify Ansible
+        run: |
+          ansible --version
+          python3 -m pip list | grep winrm
 
-    - name: Run Playbook
-      env:
-       PYTHONPATH: /home/runner/.local/lib/python3.12/site-packages
-      run: |
-        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
+      - name: Create Inventory
+        run: |
+          mkdir -p ansible
+
+          cat > ansible/inventory.ini << EOF
+          [windows]
+          vm ansible_host=${{ secrets.WIN_HOST }}
+
+          [windows:vars]
+          ansible_user=${{ secrets.WIN_USER }}
+          ansible_password=${{ secrets.WIN_PASSWORD }}
+          ansible_connection=winrm
+          ansible_port=5985
+          ansible_winrm_transport=basic
+          ansible_winrm_server_cert_validation=ignore
+          EOF
+
+      - name: Run Playbook
+        run: |
+          ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -vvv
